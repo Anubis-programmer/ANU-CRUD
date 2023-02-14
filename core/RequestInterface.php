@@ -1,7 +1,7 @@
 <?php
 
 interface RequestInterface {
-    public function getUrlQueryParams();
+    public function getUrlQuery();
 
     public function getBody();
     
