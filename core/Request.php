@@ -117,7 +117,7 @@ class Request implements RequestInterface {
         return $result;
     }
 
-    public function getUrlQueryParams() {
+    public function getUrlQuery() {
         if($this->requestMethod == 'POST' || $this->requestMethod == 'PUT') {
             return null;
         } else if($this->requestMethod == 'GET' || $this->requestMethod == 'DELETE') {
