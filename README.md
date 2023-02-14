@@ -143,13 +143,13 @@ $router = new Router(new Request);
         - Can have access to the uploaded files (if any) via <code>$request->getFiles()</code>
         - <strong>Example</strong> -- Creating a new entry (we don't know the <strong>ID</strong> attribute yet)
     - <strong>Read</strong> can be achieved using <strong>GET</strong> HTTP method (accessible as <code>$router->get()</code>).
-        - Can have <strong>URL query params</strong> which is an associative array accessible via <code>$request->getUrlQueryParams()</code> (parsed from the query part of the URL, i.e.: <code>/link?key1=val1&Key2=val2</code>)
+        - Can have <strong>URL query params</strong> which is an associative array accessible via <code>$request->getUrlQuery()</code> (parsed from the query part of the URL, i.e.: <code>/link?key1=val1&Key2=val2</code>)
         - <strong>Example</strong> -- Getting multiple items or data of a requested item (usually referred by an <strong>ID</strong> attribute)
     - <strong>Update</strong> can be achieved using <strong>PUT</strong> HTTP method (accessible as <code>$router->put()</code>).
         - Can have <strong>request body</strong> which is an associative array, accessible via <code>$request->getBody()</code> (parsed from HTTP Request body)
         - <strong>Example</strong> -- Updating an existing entry (we refer to the entry we want to modify using an <strong>ID</strong> attribute)
     - <strong>Delete</strong> can be achieved using <strong>DELETE</strong> HTTP method (accessible as <code>$router->delete()</code>).
-        - Can have <strong>URL query params</strong> which is an associative array accessible via <code>$request->getUrlQueryParams()</code> (parsed from the query part of the URL, i.e.: <code>/link?key1=val1&Key2=val2</code>)
+        - Can have <strong>URL query params</strong> which is an associative array accessible via <code>$request->getUrlQuery()</code> (parsed from the query part of the URL, i.e.: <code>/link?key1=val1&Key2=val2</code>)
         - <strong>Example</strong> -- Deleting an item specified by an <strong>ID</strong> attribute
 
 <h3 id="ui-routes">Routes for <strong>UI</strong></h3>
@@ -179,12 +179,12 @@ $router = new Router(new Request);
 <h3 id="xhr-routes">Routes for <strong>XMLHttpRequests</strong></h3>
 
 - The <strong>URL params</strong> (those are parts of the end-point URL) can <strong>ALWAYS</strong> be accessed using the <code>$request->urlParams</code> associative array<br>
-(i.e.: <code>'/images/:images'</code> can be accessed as <code>$request->urlParams['images']</code>).
+(i.e.: <code>$imageId</code> from route <code>'/images/:images'</code> can be extracted using <code>$imageId = $request->urlParams['images'];</code>).
 - If handling  <strong>POST</strong> or <strong>PUT</strong> requests, the <strong>request body</strong> sent to server can be accessed as an associative array using <code>$request->getBody()</code>.
     - If file(s) were uploaded, you can access them via <code>$request->getFiles()</code>.<br>
-    Only works with <strong>POST</strong> requests.
-- If handling <strong>GET</strong> or <strong>DELETE</strong> HTTP requests, the <strong>URL query params</strong> can be accessed as an associative array using <code>$request->getUrlQueryParams()</code><br>
-(i.e.: if <code>/posts?page=0&limit=10</code> has been called, <code>page</code> and <code>limit</code> query params will be accessible as <code>$request->getUrlQueryParams()['page']</code> and <code>$request->getUrlQueryParams()['limit']</code> respectively).
+    <strong>Sending files</strong> to the server only works using <strong>POST</strong> requests!
+- If handling <strong>GET</strong> or <strong>DELETE</strong> HTTP requests, the <strong>URL query</strong> params can be accessed as an associative array using <code>$request->getUrlQuery()</code><br>
+(i.e.: if <code>/posts?page=0&limit=10</code> has been called, <code>page</code> and <code>limit</code> query params will be accessible as <code>$request->getUrlQuery()['page']</code> and <code>$request->getUrlQuery()['limit']</code> respectively).
 
 <h4 id="accessing-url-params">Accessing <strong>URL params</strong> (supported HTTP methods: <strong>GET</strong>, <strong>POST</strong>, <strong>PUT</strong> and <strong>DELETE</strong>)</h4>
 
@@ -210,10 +210,10 @@ $router->get(
 
 ```php
 $router->get("/posts", function($request) { // Full URL is '/posts?page=0&limit=10'
-    $queryParams = $request->getUrlQueryParams();
+    $query = $request->getUrlQuery();
     $posts = [];
-    $start = (int) $queryParams['page'];
-    $limit = $start + (int) $queryParams['limit'];
+    $start = (int) $query['page'];
+    $limit = $start + (int) $query['limit'];
 
     for($i = $start; $i < $limit; $i++) {
         array_push($posts, [
@@ -223,7 +223,7 @@ $router->get("/posts", function($request) { // Full URL is '/posts?page=0&limit=
     }
 
     $response = [
-        'page' => $queryParams['page'] + $queryParams['limit'],
+        'page' => $query['page'] + $query['limit'],
         'posts' => $posts
     ];
     
