@@ -14,7 +14,7 @@ class Request implements RequestInterface {
 
     private function setUriParams($uriParams) {
         foreach($uriParams as $uri) {
-            $uriParts = explode('=', $uri);
+            $uriParts = explode('=', $uri, 2);
             $this->uriParams[$uriParts[0]] = $uriParts[1];
         }
     }
@@ -29,9 +29,7 @@ class Request implements RequestInterface {
                 $cleanTrimmedValue = trim($urlWithUriParams[0]);
                 $uriParamsString = $urlWithUriParams[1];
 
-                if(strpos($uriParamsString, '&amp;') !== false) {
-                    $this->setUriParams(explode('&amp;', $uriParamsString));
-                }
+                $this->setUriParams(explode('&amp;', $uriParamsString));
             }
         }
 
@@ -39,7 +37,7 @@ class Request implements RequestInterface {
     }
 
     private function setJSONResponseHeader($url) {
-        if(strpos($url, '/' . BASE_URI . '/') != false) {
+        if(strpos($url, '/' . BASE_URI . '/') !== false) {
             header("Access-Control-Allow-Origin: *");
             header("Content-Type: application/json; charset=UTF-8");
         }
@@ -117,7 +115,7 @@ class Request implements RequestInterface {
         return $result;
     }
 
-    public function getUrlQuery() {
+    public function getUrlQueryParams() {
         if($this->requestMethod == 'POST' || $this->requestMethod == 'PUT') {
             return null;
         } else if($this->requestMethod == 'GET' || $this->requestMethod == 'DELETE') {
@@ -136,8 +134,12 @@ class Request implements RequestInterface {
                 if(isset($_POST['data']) && !empty($_POST['data'])) {
                     $post = json_decode($_POST['data'], true);
                 }
-            } else if(file_get_contents("php://input")) {
-                $post = json_decode(file_get_contents("php://input"), true);
+            } else {
+                $rawInput = file_get_contents("php://input");
+                
+                if($rawInput) {
+                    $post = json_decode($rawInput, true);
+                }
             }
 
             if(isset($post) && !empty($post)) {
