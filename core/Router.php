@@ -15,6 +15,8 @@ class Router {
 
         if(!in_array(strtoupper($name), $this->supportedHttpMethods)) {
             $this->invalidMethodHandler();
+            
+            return;
         }
 
         $this->{
@@ -43,16 +45,16 @@ class Router {
     function resolve() {
         $methodDictionary = $this->{
             strtolower($this->request->requestMethod)
-        };
+        } ?? [];
         
         $formattedRoute = $this->formatRoute($this->request->requestUri);
         $formattedRouteSchema = $this->formatRoute($this->request->requestUriSchema);
         $method = null;
 
-        if(in_array($formattedRoute, $methodDictionary)) {
+        if(array_key_exists($formattedRoute, $methodDictionary)) {
             $method = $methodDictionary[$formattedRoute];
         } else {
-            $method = $methodDictionary[$formattedRouteSchema];
+            $method = $methodDictionary[$formattedRouteSchema] ?? null;
         }
 
         for($i = 0; $i < count($this->request->urlParams); $i++) {
